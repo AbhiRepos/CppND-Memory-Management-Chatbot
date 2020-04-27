@@ -35,15 +35,60 @@ ChatBot::~ChatBot()
     std::cout << "ChatBot Destructor" << std::endl;
 
     // deallocate heap memory
-    if(_image != NULL) // Attention: wxWidgets used NULL and not nullptr
+    if (_image != NULL) // Attention: wxWidgets used NULL and not nullptr
     {
         delete _image;
         _image = NULL;
     }
+    std::cout << "_____________________________" << std::endl;
 }
 
 //// STUDENT CODE
 ////
+
+ChatBot::ChatBot(const ChatBot &chatBot)
+    : _image(chatBot._image),
+      _currentNode(chatBot._currentNode),
+      _rootNode(chatBot._rootNode),
+      _chatLogic(chatBot._chatLogic)
+{
+    std::cout << "ChatBot Copy Constructor" << std::endl;
+}
+
+ChatBot &ChatBot::operator=(const ChatBot &chatBot)
+{
+    std::cout << "ChatBot Copy Assignment Operator" << std::endl;
+    if (this != &chatBot)
+    {
+        _image = chatBot._image;
+        _currentNode = chatBot._currentNode;
+        _rootNode = chatBot._rootNode;
+        _chatLogic = chatBot._chatLogic;
+    }
+    return *this;
+}
+
+ChatBot::ChatBot(ChatBot &&chatBot) noexcept
+    : _image(std::exchange(chatBot._image, nullptr)),
+      _currentNode(std::exchange(chatBot._currentNode, nullptr)),
+      _rootNode(std::exchange(chatBot._rootNode, nullptr)),
+      _chatLogic(std::exchange(chatBot._chatLogic, nullptr))
+{
+    std::cout << "ChatBot Move Constructor" << std::endl;
+}
+
+ChatBot &ChatBot::operator=(ChatBot &&chatBot) noexcept
+{
+    std::cout << "ChatBot Move Assignment Operator" << std::endl;
+    if (this != &chatBot)
+    {
+        _image = std::exchange(chatBot._image, nullptr);
+        _currentNode = std::exchange(chatBot._currentNode, nullptr);
+        _rootNode = std::exchange(chatBot._rootNode, nullptr);
+        _chatLogic = std::exchange(chatBot._chatLogic, nullptr);
+    }
+    return *this;
+}
 
 ////
 //// EOF STUDENT CODE
@@ -94,6 +139,7 @@ void ChatBot::SetCurrentNode(GraphNode *node)
     std::string answer = answers.at(dis(generator));
 
     // send selected node answer to user
+    _chatLogic->SetChatbotHandle(this);
     _chatLogic->SendMessageToUser(answer);
 }
 
